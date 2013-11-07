@@ -16,6 +16,7 @@ class Kafka < Thor
   method_option :vendor, :type => :string
   method_option :version, :type => :string, :aliases => "-v", :required => true
   method_option :release, :type => :string, :aliases => "-r", :required => true
+  method_option :url, :type => :string, :default => 'http://www.eu.apache.org/dist/incubator/kafka/kafka-0.7.2-incubating/kafka-0.7.2-incubating-src.tgz'
 
   def build
     variables(options)
@@ -34,7 +35,7 @@ class Kafka < Thor
     @workdir = File.expand_path('./build', File.dirname(__FILE__))
     @confdir = File.expand_path('./conf', File.dirname(__FILE__))
     @pwd = File.dirname(__FILE__)
-    @url = 'http://www.eu.apache.org/dist/incubator/kafka/kafka-0.7.2-incubating/kafka-0.7.2-incubating-src.tgz'
+    @url = opts[:url]
     if opts.key?('vendor')
       vendor = opts[:vendor]
     else
@@ -180,3 +181,4 @@ class Kafka < Thor
   end
 
 end
+
