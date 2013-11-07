@@ -139,13 +139,15 @@ class Kafka < Thor
 -d "default-jre" \
 --before-install "#{@confdir}/preinst" \
 --after-install "#{@confdir}/postinst" \
---config-files "/etc/init.d/kafka-server" \
+--config-files "/etc/init.d/kafka" \
+--config-files "/etc/default/kafka" \
 --config-files "/etc/kafka/server.properties"  \
 --config-files "/etc/kafka/producer.properties" \
 --config-files "/etc/kafka/zookeeper.properties" \
 --config-files "/etc/kafka/consumer.properties" \
 --config-files "/etc/kafka/log4j.properties" \
 --config-files "/etc/security/limits.d/kafka-nofiles.conf" \
+--config-files "/etc/logrotate.d/kafka" \
 --verbose)
     puts cmd
     # dot at the end will add all files in build/ dir
