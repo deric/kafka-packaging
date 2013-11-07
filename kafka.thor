@@ -6,7 +6,7 @@ require 'thor'
 require './lib/helpers'
 
 
-# Thor task for building package
+# Thor task for building Kafka package
 class Kafka < Thor
 
   include BuildHelpers
@@ -91,12 +91,13 @@ class Kafka < Thor
   def copy_config
     with_deb_dir do
       mkdir [ 'etc/init.d', 'etc/kafka', 'usr/lib', 'var/log/kafka',
-        'etc/security/limits.d', 'etc/default' ]
+        'etc/security/limits.d', 'etc/default', 'etc/logrotate.d' ]
     end
     cp_conf "default", "etc/default/kafka"
     cp_conf "init.debian", "etc/init.d/kafka"
     cp_conf "kafka-nofiles.conf", "etc/security/limits.d/kafka-nofiles.conf"
     cp_conf 'log4j.properties',  'etc/kafka'
+    cp_conf 'logrotate', 'etc/logrotate.d/kafka'
 
     cp_src 'config/server.properties', 'etc/kafka'
     cp_src 'config/consumer.properties', 'etc/kafka'
@@ -125,7 +126,7 @@ class Kafka < Thor
 -p "#{pkg}" \
 -s dir \
 -n #{c[:name]}  \
--v "#{c[:version]}~#{c[:release]}"  \
+-v "#{c[:version]}-#{c[:release]}"  \
 --description "#{c[:description]}" \
 --url="#{c[:url]}" \
 -a "#{c[:arch]}" \
