@@ -106,13 +106,13 @@ class Kafka < Thor
 
   # Compile kafka and build deb package
   def make_pkg
-  #  with_src_dir do
-  #    msg "Updating Kafka"
-  #    system('./sbt update')
-  #    print "Building Kafka"
-  #    system('./sbt package')
-  #  end
-  #  cptree @src_dir, "#{@workdir}/usr/lib/kafka"
+    with_src_dir do
+      msg "Updating Kafka"
+      system('./sbt update')
+      msg "Building Kafka"
+      system('./sbt package')
+    end
+    cptree @src_dir, "#{@workdir}/usr/lib/kafka"
 
     build_pkg
   end

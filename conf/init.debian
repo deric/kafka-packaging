@@ -1,6 +1,6 @@
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides:          kafka-server
+# Provides:          kafka
 # Required-Start:    $remote_fs $network
 # Required-Stop:     $remote_fs
 # Default-Start:     2 3 4 5
@@ -9,12 +9,12 @@
 # Description:       Kafka is a high-throughput distributed messaging system.
 ### END INIT INFO
 #
-# /etc/init.d/kafka-server
+# /etc/init.d/kafka
 #
-# Startup script for kafka-server
+# Startup script for kafka
 #
 # chkconfig: 2345 20 80
-# description: Starts and stops kafka-server
+# description: Starts and stops kafka
 
 #
 # this script based on: https://github.com/nmilford/specfiles/blob/master/kafka-0.7/kafka-server
