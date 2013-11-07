@@ -21,6 +21,8 @@ chown -R root:root /etc/init.d/kafka
 chown -R root:root /etc/kafka
 chown -R root:root /etc/security/limits.d/kafka-nofiles.conf
 chown -R root:root /usr/lib/kafka
+chown -R root:root /etc/default/kafka
+chown -R root:root /etc/logrotate.d/kafka
 update-rc.d kafka defaults 98 02
 exit 0
 
