@@ -1,0 +1,88 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          kafka-server
+# Required-Start:    $remote_fs $network
+# Required-Stop:     $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Startup script for Kafka server
+# Description:       Kafka is a high-throughput distributed messaging system.
+### END INIT INFO
+#
+# /etc/init.d/kafka-server
+#
+# Startup script for kafka-server
+#
+# chkconfig: 2345 20 80
+# description: Starts and stops kafka-server
+
+#
+# this script based on: https://github.com/nmilford/specfiles/blob/master/kafka-0.7/kafka-server
+#
+
+. /lib/lsb/init-functions
+
+SCALA_VERSION="2.8.0"
+
+desc="Kafka (kafka-server)"
+
+if [ -f /etc/default/kafka ]; then
+  . /etc/default/kafka
+fi
+
+start() {
+  echo "Starting $desc: "
+echo "kafka home: $KAFKA_HOME"
+
+  # Build up classpath
+  CL_PATH="${CLASSPATH}"
+  for jar in `find $KAFKA_HOME -name '*jar'`; do
+    CL_PATH+=":$jar"
+  done
+
+  if [ -z "$JAVA_OPTS" ]; then
+    JAVA_OPTS="-Xmx512M -server  -Dlog4j.configuration=file:$KAFKA_CONF/log4j.properties"
+  fi
+
+  if [ -z "$JAVA_HOME" ]; then
+    JAVA="java"
+  else
+    JAVA="$JAVA_HOME/bin/java"
+  fi
+  CMD="nohup $JAVA $JAVA_OPTS -cp ${CL_PATH} kafka.Kafka $KAFKA_CONF/server.properties >>$KAFKA_LOG 2>&1 &"
+#  echo "kafka cmd: ${CMD}"
+  su $KAFKA_USER -c "${CMD}"
+  RETVAL=$?
+  return $RETVAL
+}
+
+stop() {
+  echo "Shutting down  $desc: "
+  pkill -f kafka.Kafka
+}
+
+restart() {
+    stop
+    start
+}
+
+status() {
+  pid=$(pgrep -f kafka.Kafka)
+
+  if [ -z $pid ]; then
+    echo "kafka-server is NOT running."
+  else
+    echo "kafka-server is running (pid is $pid)."
+  fi
+
+}
+
+case "$1" in
+  start)   start;;
+  stop)    stop;;
+  restart) restart;;
+  status)  status;;
+  *)       echo "Usage: $0 {start|stop|restart}"
+           RETVAL=2;;
+esac
+exit $RETVAL

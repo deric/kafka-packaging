@@ -26,6 +26,7 @@ module BuildHelpers
   end
 
   def mkdir(path)
+    msg "creating path: '%s'" % path.to_s
     return if path.nil?
     if path.respond_to? :each
       path.each do |p|
@@ -36,8 +37,22 @@ module BuildHelpers
     end
   end
 
+  def dir_exists?(directory)
+    File.directory?(directory)
+  end
+
+  def cp(src, dst)
+    msg "copying %s" % src
+    `cp #{src} #{dst}`
+  end
+
+  def cptree(src, dst)
+    msg "copying %s" % src
+    FileUtils.copy_entry src, dst
+  end
+
   def architecture
-    case lsb_release_tag
+    case linux
     when /ubuntu|debian/
       return `dpkg-architecture -qDEB_BUILD_ARCH`
     else
@@ -45,11 +60,15 @@ module BuildHelpers
     end
   end
 
-  def lsb_release_tag
+  def linux
     @lsb_release_tag ||= `lsb_release --id --release | cut -d: -f2 | tr A-Z a-z | xargs | tr ' ' '/'`
   end
 
-  def find_gem_bin
+  def gem_bin
     `gem env | sed -n '/^ *- EXECUTABLE DIRECTORY: */ { s/// ; p }'`
+  end
+
+  def local_user
+    `whoami`.strip
   end
 end
