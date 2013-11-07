@@ -17,10 +17,10 @@
 
 chown kafka:kafka /var/log/kafka
 # when created on a mac, user is 501 :(
-chown -R root:root /etc/init.d/kafka-server
+chown -R root:root /etc/init.d/kafka
 chown -R root:root /etc/kafka
 chown -R root:root /etc/security/limits.d/kafka-nofiles.conf
-chown -R root:root /etc/sysconfig/kafka
 chown -R root:root /usr/lib/kafka
-update-rc.d kafka-server defaults 98 02
+update-rc.d kafka defaults 98 02
 exit 0
+
