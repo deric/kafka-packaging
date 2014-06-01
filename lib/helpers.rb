@@ -3,6 +3,7 @@
 
 require 'fileutils'
 require 'colorize'
+require 'open3'
 
 module BuildHelpers
 
@@ -12,6 +13,25 @@ module BuildHelpers
 
   def err(error)
     puts "[ERROR] %s".red % error
+  end
+
+  def exec(cmd)
+    begin
+      puts "exec: #{cmd}".yellow
+      stdin, stdout, stderr, wait_thr = Open3.popen3(cmd)
+      stdout.gets(nil)
+      stderr.gets(nil)
+      exit_code = wait_thr.value
+
+      unless exit_code.success?
+        err "command '#{cmd}' failed. exiting."
+        exit 1
+      end
+    rescue Exception => e
+      err e.message
+      err "command '#{cmd}' failed. exiting."
+      exit 1
+    end
   end
 
   def rmdir(path)

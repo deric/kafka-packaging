@@ -18,13 +18,14 @@ class Kafka < Thor
   method_option :release, :type => :string, :aliases => "-r", :required => true
   method_option :url, :type => :string, :default => ''
   method_option :git, :type => :string, :default => 'https://git-wip-us.apache.org/repos/asf/kafka.git'
+  method_option :branch, :type => :string, :default => '0.8'
 
   def build
     variables(options)
     cleanup(@workdir)
     prepare
     if @url == nil || @url.empty?
-      clone(@git)
+      clone(options[:git])
     else
       checkout(@url)
     end
@@ -71,7 +72,7 @@ class Kafka < Thor
   def cleanup(workdir)
     msg 'cleaning old package...'
     unless Dir.glob('kafka*.deb').empty?
-      `rm kafka*.deb`
+      exec 'rm kafka*.deb'
     end
     rmdir(workdir)
   end
@@ -86,7 +87,7 @@ class Kafka < Thor
     tar_file = url.split('/').last
     msg "file: %s" % tar_file
     unless File.exists?(tar_file)
-      `wget #{url}`
+      exec "wget #{url}"
     end
     `tar xzf #{tar_file} -C #{@src_dir}`
     @src_dir << '/' << tar_file[0...tar_file.rindex('.')]
@@ -94,15 +95,18 @@ class Kafka < Thor
   end
 
   def clone(url)
+    msg `pwd`
     clone_cmd = 'git clone %s' % url
     repo_dir = 'kafka'
-    if Directory.exists?(repo_dir)
-      `cd #{repo_dir}`
-      `git checkout master && git pull`
+    if File.exists?(repo_dir)
+      exec "cd #{repo_dir}"
+      exec "git checkout master && git pull"
     else
       msg 'cloning repo %s' % url
-      `#{clone_cmd}`
+      exec "#{clone_cmd}"
+      exec "cd #{repo_dir}"
     end
+    exec "git checkout -b #{branch} remotes/origin/#{branch}"
   end
 
   # Copy configuration files to package root
@@ -127,9 +131,10 @@ class Kafka < Thor
   def make_pkg
     with_src_dir do
       msg "Updating Kafka"
-      system('./sbt update')
+      exec './sbt update'
       msg "Building Kafka"
-      system('./sbt package')
+      exec './sbt package'
+      exec './sbt assembly-package-dependency'
     end
     cptree @src_dir, "#{@workdir}/usr/lib/kafka"
 
