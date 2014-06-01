@@ -16,13 +16,18 @@ class Kafka < Thor
   method_option :vendor, :type => :string
   method_option :version, :type => :string, :aliases => "-v", :required => true
   method_option :release, :type => :string, :aliases => "-r", :required => true
-  method_option :url, :type => :string, :default => 'http://www.eu.apache.org/dist/incubator/kafka/kafka-0.7.2-incubating/kafka-0.7.2-incubating-src.tgz'
+  method_option :url, :type => :string, :default => ''
+  method_option :git, :type => :string, :default => 'https://git-wip-us.apache.org/repos/asf/kafka.git'
 
   def build
     variables(options)
     cleanup(@workdir)
     prepare
-    checkout(@url)
+    if @url == nil || @url.empty?
+      clone(@git)
+    else
+      checkout(@url)
+    end
     copy_config
     make_pkg
     finish
@@ -86,6 +91,18 @@ class Kafka < Thor
     `tar xzf #{tar_file} -C #{@src_dir}`
     @src_dir << '/' << tar_file[0...tar_file.rindex('.')]
     puts "src dir: #{@src_dir}"
+  end
+
+  def clone(url)
+    clone_cmd = 'git clone %s' % url
+    repo_dir = 'kafka'
+    if Directory.exists?(repo_dir)
+      `cd #{repo_dir}`
+      `git checkout master && git pull`
+    else
+      msg 'cloning repo %s' % url
+      `#{clone_cmd}`
+    end
   end
 
   # Copy configuration files to package root
