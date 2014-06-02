@@ -111,6 +111,7 @@ class Kafka < Thor
     if curr_branch != @branch
       exec "git checkout -b #{@branch} remotes/origin/#{@branch}"
     end
+    @src_dir = repo_dir
   end
 
   # Copy configuration files to package root
