@@ -53,6 +53,7 @@ class Kafka < Thor
     else
       maintainer = local_user
     end
+    @branch = opts[:branch]
     @deb = {
       name: 'kafka',
       version: opts[:version],
@@ -95,18 +96,21 @@ class Kafka < Thor
   end
 
   def clone(url)
-    msg `pwd`
     clone_cmd = 'git clone %s' % url
-    repo_dir = 'kafka'
-    if File.exists?(repo_dir)
-      exec "cd #{repo_dir}"
-      exec "git checkout master && git pull"
+    repo_dir = "#{@pwd}/kafka"
+    if File.directory?(repo_dir)
+      cd repo_dir
+      exec "cd #{repo_dir} && git pull"
     else
       msg 'cloning repo %s' % url
       exec "#{clone_cmd}"
-      exec "cd #{repo_dir}"
+      cd repo_dir
     end
-    exec "git checkout -b #{branch} remotes/origin/#{branch}"
+    curr_branch = `git rev-parse --abbrev-ref HEAD`.strip!
+    msg "current branch '%s', req '%s'" % [ curr_branch, @branch ]
+    if curr_branch != @branch
+      exec "git checkout -b #{@branch} remotes/origin/#{@branch}"
+    end
   end
 
   # Copy configuration files to package root

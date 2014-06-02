@@ -15,21 +15,27 @@ module BuildHelpers
     puts "[ERROR] %s".red % error
   end
 
+  # In a ruby script we can't just change current path
+  def cd(path)
+    Dir.chdir(path)
+  end
+
   def exec(cmd)
     begin
-      puts "exec: #{cmd}".yellow
+      msg "exec: '#{cmd}'"
       stdin, stdout, stderr, wait_thr = Open3.popen3(cmd)
-      stdout.gets(nil)
-      stderr.gets(nil)
+      out = stdout.gets(nil)
       exit_code = wait_thr.value
 
       unless exit_code.success?
         err "command '#{cmd}' failed. exiting."
-        exit 1
+        err out
+        err stderr.gets
+        exit
       end
     rescue Exception => e
       err e.message
-      err "command '#{cmd}' failed. exiting."
+      err stderr.gets
       exit 1
     end
   end
@@ -63,12 +69,16 @@ module BuildHelpers
 
   def cp(src, dst)
     msg "copying %s" % src
-    `cp #{src} #{dst}`
+    exec "cp #{src} #{dst}"
   end
 
   def cptree(src, dst)
     msg "copying %s" % src
     FileUtils.copy_entry src, dst
+  end
+
+  def pwd
+    `pwd`
   end
 
   def architecture
