@@ -15,14 +15,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-chown kafka:kafka /var/log/kafka
-# when created on a mac, user is 501 :(
-chown -R root:root /etc/init.d/kafka
-chown -R root:root /etc/kafka
-chown -R root:root /etc/security/limits.d/kafka-nofiles.conf
-chown -R root:root /usr/lib/kafka
-chown -R root:root /etc/default/kafka
-chown -R root:root /etc/logrotate.d/kafka
-update-rc.d kafka defaults 98 02
+set -e
+
+case "$1" in
+  configure)
+    #chown kafka:kafka /var/log/kafka
+    if [ -f /etc/init.d/kafka ];then
+      chown 0:0 /etc/init.d/kafka
+      update-rc.d kafka defaults 98 02
+    fi
+    chown -R 0:0 /etc/kafka
+    chown 0:0 /etc/security/limits.d/kafka-nofiles.conf
+    chown -R 0:0 /usr/lib/kafka
+    chown 0:0 /etc/default/kafka
+    chown 0:0 /etc/logrotate.d/kafka
+   ;;
+
+  abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+  *)
+    echo "postinst called with unknown argument \`$1'" >&2
+    exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
 exit 0
 

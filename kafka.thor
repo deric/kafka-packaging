@@ -171,7 +171,6 @@ class Kafka < Thor
 -d "default-jre" \
 --before-install "#{@confdir}/preinst" \
 --after-install "#{@confdir}/postinst" \
---config-files "/etc/init.d/kafka" \
 --config-files "/etc/default/kafka" \
 --config-files "/etc/kafka/server.properties"  \
 --config-files "/etc/kafka/producer.properties" \
