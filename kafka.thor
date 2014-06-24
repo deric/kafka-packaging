@@ -140,10 +140,13 @@ class Kafka < Thor
       msg "Building Kafka"
       exec './sbt package'
       exec './sbt assembly-package-dependency'
+      exec './sbt release-tar'
     end
-    source_jar = expand "#{@src_dir}/target/scala-*/kafka_*.jar"
+    rel_dir = "#{@src_dir}/target/RELEASE/kafka_*"
+    source_jar = expand "#{rel_dir}/kafka_*.jar"
     cp source_jar, "#{@workdir}/usr/lib/kafka"
-#    cptree @src_dir, "#{@workdir}/usr/lib/kafka"
+    cptree "#{rel_dir}/libs", "#{@workdir}/usr/lib/kafka"
+    cptree "#{rel_dir}/bin", "#{@workdir}/usr/lib/kafka"
 
     build_pkg
   end

@@ -76,7 +76,7 @@ module BuildHelpers
 
   def cptree(src, dst)
     msg "copying %s" % src
-    FileUtils.copy_entry src, dst
+    exec "cp -r #{src} #{dst}"
   end
 
   # Expand wildcards in path
