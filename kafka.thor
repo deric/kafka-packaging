@@ -117,7 +117,7 @@ class Kafka < Thor
   # Copy configuration files to package root
   def copy_config
     with_deb_dir do
-      mkdir [ 'etc/init.d', 'etc/kafka', 'usr/lib', 'var/log/kafka',
+      mkdir [ 'etc/init.d', 'etc/kafka', 'usr/lib/kafka', 'var/log/kafka',
         'etc/security/limits.d', 'etc/default', 'etc/logrotate.d' ]
     end
     cp_conf "default", "etc/default/kafka"
@@ -141,7 +141,9 @@ class Kafka < Thor
       exec './sbt package'
       exec './sbt assembly-package-dependency'
     end
-    cptree @src_dir, "#{@workdir}/usr/lib/kafka"
+    source_jar = expand "#{@src_dir}/target/scala-*/kafka_*.jar"
+    cp source_jar, "#{@workdir}/usr/lib/kafka"
+#    cptree @src_dir, "#{@workdir}/usr/lib/kafka"
 
     build_pkg
   end
@@ -194,7 +196,7 @@ class Kafka < Thor
   end
 
   def finish
-    rmdir(@src_dir)
+    #rmdir(@src_dir)
   end
 
   def with_deb_dir

@@ -44,10 +44,12 @@ module BuildHelpers
     return if path.nil?
     if path.respond_to? :each
       path.each do |p|
-        FileUtils.rmdir p
+        msg "deleting '#{p}'"
+        FileUtils.rm_rf p
       end
     else
-      FileUtils.rmdir path
+      msg "deleting '#{path}'"
+      FileUtils.rm_rf path
     end
   end
 
@@ -75,6 +77,13 @@ module BuildHelpers
   def cptree(src, dst)
     msg "copying %s" % src
     FileUtils.copy_entry src, dst
+  end
+
+  # Expand wildcards in path
+  #
+  def expand(path)
+    res = `ls #{path}`
+    res.strip! unless res == nil
   end
 
   def pwd
