@@ -19,11 +19,17 @@ set -e
 
 case "$1" in
   configure)
-    #chown kafka:kafka /var/log/kafka
+    chown kafka:kafka /var/log/kafka
     if [ -f /etc/init.d/kafka ];then
       chown 0:0 /etc/init.d/kafka
       update-rc.d kafka defaults 98 02
     fi
+    for SCRIPT in consumer log4j producer server zookeeper; do
+      if [ ! -L "/etc/kafka/${SCRIPT}.properties" ]; then
+        ln -s "/usr/lib/kafka/config/${SCRIPT}.properties" "/etc/kafka/${SCRIPT}.properties"
+      fi
+    done
+
     chown -R 0:0 /etc/kafka
     chown 0:0 /etc/security/limits.d/kafka-nofiles.conf
     chown -R 0:0 /usr/lib/kafka

@@ -139,13 +139,14 @@ class Kafka < Thor
       exec './sbt update'
       msg "Building Kafka"
       exec './sbt package'
-      exec './sbt assembly-package-dependency'
+      #exec './sbt assembly-package-dependency'
       exec './sbt release-tar'
     end
     rel_dir = "#{@src_dir}/target/RELEASE/kafka_*"
     source_jar = expand "#{rel_dir}/kafka_*.jar"
     cp source_jar, "#{@workdir}/usr/lib/kafka"
     cptree "#{rel_dir}/libs", "#{@workdir}/usr/lib/kafka"
+    cptree "#{rel_dir}/config", "#{@workdir}/usr/lib/kafka"
     cptree "#{rel_dir}/bin", "#{@workdir}/usr/lib/kafka"
 
     build_pkg
@@ -172,11 +173,11 @@ class Kafka < Thor
 --before-install "#{@confdir}/preinst" \
 --after-install "#{@confdir}/postinst" \
 --config-files "/etc/default/kafka" \
---config-files "/etc/kafka/server.properties"  \
---config-files "/etc/kafka/producer.properties" \
---config-files "/etc/kafka/zookeeper.properties" \
---config-files "/etc/kafka/consumer.properties" \
---config-files "/etc/kafka/log4j.properties" \
+--config-files "/usr/lib/kafka/config/server.properties"  \
+--config-files "/usr/lib/kafka/config/producer.properties" \
+--config-files "/usr/lib/kafka/config/zookeeper.properties" \
+--config-files "/usr/lib/kafka/config/consumer.properties" \
+--config-files "/usr/lib/kafka/log4j.properties" \
 --config-files "/etc/security/limits.d/kafka-nofiles.conf" \
 --config-files "/etc/logrotate.d/kafka" \
 --verbose)
