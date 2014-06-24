@@ -20,6 +20,8 @@ class Kafka < Thor
   method_option :git, :type => :string, :default => 'https://git-wip-us.apache.org/repos/asf/kafka.git'
   method_option :branch, :type => :string, :default => '0.8'
   method_option :tag, :type => :string, :default => ''
+  # since 0.8.1 kafka it's not build with 'sbt'
+  method_option :tool, :type => :string, :default => 'gradlew'
 
   def build
     variables(options)
@@ -56,6 +58,7 @@ class Kafka < Thor
     end
     @branch = opts[:branch]
     @tag = opts[:tag]
+    @tool = opts[:tool]
     @deb = {
       name: 'kafka',
       version: opts[:version],
@@ -135,12 +138,18 @@ class Kafka < Thor
   # Compile kafka and build deb package
   def make_pkg
     with_src_dir do
-      msg "Updating Kafka"
-      exec './sbt update'
-      msg "Building Kafka"
-      exec './sbt package'
-      #exec './sbt assembly-package-dependency'
-      exec './sbt release-tar'
+      if @tool == 'sbt'
+        msg "Updating Kafka"
+        exec './sbt update'
+        msg "Building Kafka"
+        exec './sbt package'
+        #exec './sbt assembly-package-dependency'
+        exec './sbt release-tar'
+      else
+        msg "Using gradle"
+        exec './gradlew clean'
+        exec './gradlew releaseTarGz'
+      end
     end
     rel_dir = "#{@src_dir}/target/RELEASE/kafka_*"
     source_jar = expand "#{rel_dir}/kafka_*.jar"
