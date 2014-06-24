@@ -19,6 +19,7 @@ class Kafka < Thor
   method_option :url, :type => :string, :default => ''
   method_option :git, :type => :string, :default => 'https://git-wip-us.apache.org/repos/asf/kafka.git'
   method_option :branch, :type => :string, :default => '0.8'
+  method_option :tag, :type => :string, :default => ''
 
   def build
     variables(options)
@@ -54,6 +55,7 @@ class Kafka < Thor
       maintainer = local_user
     end
     @branch = opts[:branch]
+    @tag = opts[:tag]
     @deb = {
       name: 'kafka',
       version: opts[:version],
@@ -100,6 +102,7 @@ class Kafka < Thor
     repo_dir = "#{@pwd}/kafka"
     if File.directory?(repo_dir)
       cd repo_dir
+      exec "cd #{repo_dir} && git checkout #{@branch}"
       exec "cd #{repo_dir} && git pull"
     else
       msg 'cloning repo %s' % url
@@ -108,8 +111,11 @@ class Kafka < Thor
     end
     curr_branch = `git rev-parse --abbrev-ref HEAD`.strip!
     msg "current branch '%s', req '%s'" % [ curr_branch, @branch ]
-    if curr_branch != @branch
-      exec "git checkout -b #{@branch} remotes/origin/#{@branch}"
+    #if curr_branch != @branch
+    #  exec "git checkout -b #{@branch} remotes/origin/#{@branch}"
+    #end
+    unless @tag.empty?
+      exec "git checkout tags/#{@tag}"
     end
     @src_dir = repo_dir
   end
