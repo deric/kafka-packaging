@@ -38,7 +38,7 @@ case "$1" in
             adduser \
                 --system \
                 --group \
-                --home /var/lib/kafka \
+                --home /usr/lib/kafka \
                 --gecos "Apache Kafka" \
                 --shell /bin/bash \
                 kafka >/dev/null 2>/dev/null || :
