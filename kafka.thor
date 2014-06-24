@@ -123,13 +123,7 @@ class Kafka < Thor
     cp_conf "default", "etc/default/kafka"
     cp_conf "init.debian", "etc/init.d/kafka"
     cp_conf "kafka-nofiles.conf", "etc/security/limits.d/kafka-nofiles.conf"
-    cp_conf 'log4j.properties',  'etc/kafka'
     cp_conf 'logrotate', 'etc/logrotate.d/kafka'
-
-    cp_src 'config/server.properties', 'etc/kafka'
-    cp_src 'config/consumer.properties', 'etc/kafka'
-    cp_src 'config/producer.properties', 'etc/kafka'
-    cp_src 'config/zookeeper.properties', 'etc/kafka'
   end
 
   # Compile kafka and build deb package
