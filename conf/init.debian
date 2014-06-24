@@ -51,10 +51,11 @@ find_java
 JAVA=${JAVA_HOME}/bin/java
 
 # Build up classpath
-KAFKA_CLASSPATH=""
-for jar in `find $KAFKA_HOME -name 'kafka-*.jar' -o -name 'scala-library.jar' -o -name 'log4j-*.jar' -o -name 'zkclient-*.jar' -o -name 'zookeeper-*.jar'`; do
+KAFKA_CLASSPATH="`find $KAFKA_HOME -name 'kafka_*.jar'`"
+for jar in `find $KAFKA_HOME/libs -name '*.jar'`; do
   KAFKA_CLASSPATH+=":$jar"
 done
+
 
 if [ -z "$JAVA_OPTS" ]; then
  JAVA_OPTS="-Xmx512M -server  -Dlog4j.configuration=file:$KAFKA_CONF/log4j.properties"
