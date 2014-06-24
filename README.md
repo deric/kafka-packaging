@@ -15,3 +15,9 @@
 
 ```
 
+currently support checkout of git tags
+
+```
+thor kafka:build --version 0.8.1.1 --release 'p1' --tag 0.8.1.1
+```
+
